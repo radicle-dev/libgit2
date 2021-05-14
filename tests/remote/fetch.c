@@ -11,6 +11,19 @@ static const char *REPO2_REFNAME = "refs/remotes/repo1/main";
 static char *FORCE_FETCHSPEC = "+refs/heads/main:refs/remotes/repo1/main";
 static char *NON_FORCE_FETCHSPEC = "refs/heads/main:refs/remotes/repo1/main";
 
+char* strip_trailing_slash(char *path)  {
+    char *result = NULL;
+    if (path[strlen(path) - 1] == '/') {
+        result = (char *) malloc(strlen(path) - 1);
+        memcpy(result, path, strlen(path) - 1);
+    } else {
+        result = (char *) malloc(strlen(path));
+        strncpy(result, path, strlen(path));
+    }
+    return result;
+}
+
+
 void test_remote_fetch__initialize(void) {
 	git_config *c;
 	git_buf repo1_path = GIT_BUF_INIT;
@@ -32,10 +45,19 @@ void test_remote_fetch__initialize(void) {
 }
 
 void test_remote_fetch__cleanup(void) {
+    char *repo1_path = strip_trailing_slash(repo1->gitdir);
+    char *repo2_path = strip_trailing_slash(repo2->gitdir);
+
 	git_repository_free(repo1);
 	git_repository_free(repo2);
-	cl_git_sandbox_cleanup();
+
+    cl_fs_rm(repo1_path);
+    free(repo1_path);
+
+    cl_fs_rm(repo2_path);
+    free(repo2_path);
 }
+
 
 /**
  * This checks that the '+' flag on fetchspecs is respected. We create a

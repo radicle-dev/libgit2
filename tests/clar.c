@@ -781,6 +781,10 @@ void cl_set_cleanup(void (*cleanup)(void *), void *opaque)
 	_clar.local_cleanup_payload = opaque;
 }
 
+void cl_fs_rm(const char * path) {
+    fs_rm(path);
+}
+
 #include "clar/sandbox.h"
 #include "clar/fixtures.h"
 #include "clar/fs.h"
